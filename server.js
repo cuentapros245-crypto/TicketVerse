@@ -2,26 +2,31 @@ import express from 'express';
 import cors from 'cors';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
-// Herramientas avanzadas de Passport para el inicio de sesión flotante por Popup
 import session from 'express-session';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
-// Carga las variables desde el archivo .env si existe
+// 🔌 CONEXIÓN AL .ENV: Lee las variables del archivo de configuración
 dotenv.config();
 
 const app = express();
 
-// Configuración de CORS autorizada para entornos React locales
+// Captura dinámica mapeada 100% con tu archivo .env
+const PORT = process.env.PORT || 5000;
+const BACKEND_URL = process.env.TUNNEL_URL_5000 || `http://localhost:${PORT}`;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || `${BACKEND_URL}/api/auth/google/callback`;
+
+// Configuración de CORS autorizada
 app.use(cors({
-  origin: '*',
+  origin: '*', 
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
 
-// Middleware de sesiones requerido para el correcto funcionamiento de Passport
+// Middleware de sesiones para Passport
 app.use(session({
   secret: 'ticketverse_secreto_key',
   resave: false,
@@ -31,24 +36,24 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Serialización obligatoria de sesiones
+// Serialización de sesiones
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
-// CONFIGURACIÓN DE PASSPORT: Usa tus credenciales de Google Cloud Console
+// 🔐 PASSPORT CONECTADO AL .ENV: Extrae las credenciales del archivo automáticamente
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID || "816373363249-bqb4evdmbabobs4f0eg4pplml56jfgdr.apps.googleusercontent.com",
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || "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",
-    callbackURL: "http://localhost:5000/api/auth/google/callback"
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: REDIRECT_URI
   },
   (accessToken, refreshToken, profile, done) => {
     return done(null, profile);
   }
 ));
 
-// 📬 CONFIGURACIÓN DEL EMISOR NODEMAILER
-const MI_CORREO = process.env.EMAIL_USER || "cuentapros245@gmail.com"; 
-const MI_CLAVE_NUEVA = process.env.EMAIL_PASS || "jtuujqlsfvtczffg"; 
+// 📬 NODEMAILER CONECTADO AL .ENV: Extrae tus cuentas del archivo automáticamente
+const MI_CORREO = process.env.EMAIL_USER; 
+const MI_CLAVE_NUEVA = process.env.EMAIL_PASS; 
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -58,7 +63,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Mensaje interno de diagnóstico al iniciar la API
 transporter.verify((error) => {
   if (error) {
     console.error('⚠️ Error de conexión SMTP: Credenciales denegadas o no reconocidas por Google.');
@@ -71,22 +75,21 @@ transporter.verify((error) => {
 // 🔴 ENDPOINTS DE GOOGLE PASSPORT (POPUP DE REACT)
 // =========================================================================
 
-// 1. Abre el Popup y obliga a Google a mostrar el menú de gestión de cuentas
+// 1. Abre el Popup de Google Auth
 app.get('/api/auth/google', passport.authenticate('google', { 
   scope: ['profile', 'email'],
-  // 🔐 CAMBIO DE SEGURIDAD CORREGIDO: Dejamos solo select_account para que aparezca "Quita una cuenta"
   prompt: 'select_account', 
   accessType: 'offline'
 }));
 
-// 2. Procesa la respuesta de Google y le manda los datos a React de forma cruzada
+// 2. Procesa la respuesta de Google y sincroniza el éxito con el Frontend
 app.get('/api/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: 'http://localhost:5173/autenticacion' }),
+  passport.authenticate('google', { failureRedirect: `${FRONTEND_URL}/autenticacion` }),
   (req, res) => {
     const nombreUsuario = req.user?.displayName || "Usuario Google";
     const correoUsuario = req.user?.emails?.[0]?.value || "";
 
-    // Enviamos el script HTML al Popup para sincronizar con la ventana madre de React
+    // Retorna el script inyectando dinámicamente la URL real de tu cliente React
     res.send(`
       <!DOCTYPE html>
       <html lang="es">
@@ -107,7 +110,7 @@ app.get('/api/auth/google/callback',
               nombre: "${nombreUsuario}", 
               correo: "${correoUsuario}" 
             } 
-          }, 'http://localhost:5173'); 
+          }, "${FRONTEND_URL}"); 
         </script>
       </body>
       </html>
@@ -115,7 +118,7 @@ app.get('/api/auth/google/callback',
   }
 );
 
-// 3. Endpoint para cerrar la sesión local de Express y revocar Passport
+// 3. Endpoint para cerrar la sesión local de Express
 app.get('/api/auth/logout', (req, res) => {
   req.logout((err) => {
     if (err) return res.status(500).json({ success: false, error: err.message });
@@ -128,7 +131,7 @@ app.get('/api/auth/logout', (req, res) => {
   });
 });
 
-// 📌 ENDPOINT SECUNDARIO: Recibe las peticiones desde el formulario para envíos masivos/alertas
+// 📌 ENDPOINT SECUNDARIO: Envíos masivos/alertas
 app.post('/api/correos', async (req, res) => {
   console.log('📥 Solicitud de envío masivo recibida en el backend.');
   const { email, asunto, contenido } = req.body;
@@ -157,7 +160,7 @@ app.post('/api/correos', async (req, res) => {
         <h2 style="color: #ff0055; border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 0;">📢 Notificación de TicketVerse</h2>
         <p style="font-size: 15px; line-height: 1.6; color: #e0e0e0; white-space: pre-line;">${contenido}</p>
         <hr style="border: 0; border-top: 1px solid #222; margin: 20px 0;">
-        <p style="font-size: 11px; color: #666; text-align: center; margin-bottom: 0;">Este correo automatizado se generó a través de tu aplicación local localhost.</p>
+        <p style="font-size: 11px; color: #666; text-align: center; margin-bottom: 0;">Este correo automatizado se generó a través de la aplicación oficial.</p>
       </div>
     `
   };
@@ -207,7 +210,7 @@ app.post('/api/compra-exitosa', async (req, res) => {
           <p style="font-size: 12px; color: #a0a0a0; margin: 0;">Presenta este correo digital en el control de acceso del recinto.</p>
         </div>
         <hr style="border: 0; border-top: 1px solid #222; margin: 25px 0;">
-        <p style="font-size: 10px; color: #555; text-align: center; margin-bottom: 0;">© 2026 TicketVerse Localhost App. Todos los derechos reservados.</p>
+        <p style="font-size: 10px; color: #555; text-align: center; margin-bottom: 0;">© 2026 TicketVerse App. Todos los derechos reservados.</p>
       </div>
     `
   };
@@ -222,7 +225,7 @@ app.post('/api/compra-exitosa', async (req, res) => {
   }
 });
 
-const PORT = 5000;
+// Inicialización del servidor apuntando a la variable del puerto del .env
 app.listen(PORT, () => {
-  console.log(`🚀 API activa y escuchando peticiones en: http://localhost:${PORT}`);
+  console.log(`🚀 API activa y escuchando peticiones en la dirección: ${BACKEND_URL}`);
 });
