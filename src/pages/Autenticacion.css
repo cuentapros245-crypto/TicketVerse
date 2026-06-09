@@ -1,0 +1,239 @@
+.auth-screen {
+  display: flex;
+  flex-direction: column;
+  justifyContent: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #0b0c10; 
+}
+
+.auth-card {
+  font-family: system-ui, -apple-system, sans-serif;
+  width: 100%;
+  background-color: #111217; 
+  border: 1px solid #222530; 
+  padding: 35px 30px;
+  border-radius: 24px; 
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
+  color: #ffffff; 
+  transition: max-width 0.2s ease-in-out;
+}
+
+.card-login {
+  max-width: 440px;
+}
+
+.card-registro {
+  max-width: 580px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.auth-input,
+.auth-select {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid #2d3245;
+  border-radius: 20px; 
+  font-size: 14px;
+  background-color: #1f222b;
+  color: #ffffff;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.auth-input::placeholder {
+  color: #64748b;
+}
+
+.auth-input:focus,
+.auth-select:focus {
+  border-color: #ff0055;
+  background-color: #1f222b;
+}
+
+.btn-volver {
+  background: none;
+  border: none;
+  color: #39ff14; 
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: bold;
+  padding: 0;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.header-container {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.logo-text {
+  font-weight: bold;
+  font-size: 2rem;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.text-pink {
+  color: #ff0055;
+}
+
+.subtitle-text {
+  font-size: 1.3rem;
+  margin: 0.5rem 0 0 0;
+  font-weight: bold;
+  color: #fff;
+}
+
+.desc-text {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin: 0.4rem 0 0 0;
+}
+
+/* Botones Redes Sociales Verticales */
+.btn-social {
+  width: 100%;
+  background-color: #1f222b;
+  border: 1px solid #2d3245;
+  border-radius: 25px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  cursor: pointer;
+}
+
+.social-margin {
+  margin-top: 12px;
+  margin-bottom: 20px;
+}
+
+/* Divisores */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  font-size: 13px;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background-color: #2d3245;
+}
+
+.divider-text {
+  padding: 0 10px;
+  color: #64748b;
+}
+
+/* Estructura en Columnas para el registro extendido */
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.align-end {
+  align-items: flex-end;
+}
+
+.doc-grid {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.select-doc-width {
+  width: 90px !important;
+  padding: 14px 10px !important;
+}
+
+.relative-field {
+  position: relative;
+  width: 100%;
+}
+
+.btn-eye {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* Checkboxes */
+.auth-checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: #aaa;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.auth-checkbox-container input {
+  margin-top: 3px;
+  accent-color: #ff0055;
+}
+
+/* Botón Enviar Principal Rosa */
+.auth-submit-btn {
+  width: 100%;
+  background-color: #ff0055; /* Fucsia corporativo */
+  color: #ffffff;
+  padding: 14px;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 15px;
+  letter-spacing: 0.5px;
+}
+
+.auth-submit-btn:hover {
+  background-color: #e11d48;
+}
+
+.footer-toggle-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #aaa;
+}
+
+.link-highlight {
+  color: #ff0055;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: underline;
+}
