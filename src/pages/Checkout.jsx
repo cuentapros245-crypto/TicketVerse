@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { EVENTOS_POOL } from '../data/eventsData';
-import LoadingScreen from '../components/LoadingScreen'; // Asegúrate de crear este archivo también
+import LoadingScreen from '../components/LoadingScreen'; 
 
 export default function Checkout({ usuarioLogueado }) {
   const { id } = useParams();
@@ -66,7 +66,8 @@ export default function Checkout({ usuarioLogueado }) {
           }
 
           try {
-            const respuesta = await fetch('http://localhost:5000/api/compra-exitosa', {
+            // ✅ Vinculado correctamente a tu URL de producción en la nube de Render
+            const respuesta = await fetch('https://onrender.com', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
@@ -98,7 +99,7 @@ export default function Checkout({ usuarioLogueado }) {
       // El temporizador de redirección se ejecuta de fondo mientras el usuario ve el proceso
       const temporizador = setTimeout(() => {
         navigate('/mis-tickets');
-      }, 7000); // Subido a 7 segundos para dar tiempo a ver la barra y el boleto
+      }, 7000); 
 
       return () => clearTimeout(temporizador);
     }
